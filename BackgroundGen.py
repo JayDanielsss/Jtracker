@@ -45,60 +45,67 @@ detectorid=clean(detectorid)
 # In[5]:
 
 
-plt.title("HitMatrix")
-#plt.xlim(0,30)
-#plt.ylim(0,200)
-plt.scatter(detectorid[0],elementid[0],marker='_')
-
-
-# In[24]:
-
-
 ptracksElem=np.zeros(500)
 ptracksDet=np.zeros(500)
-m=random.randrange(0,50) #Random number of partial tracks to input
-for i in range(m):
-        for j in range(200):
-            n=random.randrange(len(elementid)) #Select random event number
-            st=random.randrange(1,79) #Selects station
-            r=random.randrange(0,6)
-            if(st<=34):
-                for l in range(0,6):
-                    ptracksElem[j]=elementid[n][l]
-                    ptracksDet[j]=detectorid[n][l]
-                for k in range(random.randrange(0,4)):    
-                    ptracksElem[j]=elementid[n][l+r]
-                    ptracksDet[j]=detectorid[n][l+r]
-                    ptracksElem[j]=elementid[n][l-r]
-                    ptracksDet[j]=detectorid[n][l-r]
-                    #print(ptracks[j])
-            if(st>34 and st<=62):
-                for l in range(12,18):
-                    ptracksElem[j]=elementid[n][l]
-                    ptracksDet[j]=detectorid[n][l]
-                for k in range(random.randrange(0,4)):    
-                    ptracksElem[j]=elementid[n][l+r]
-                    ptracksDet[j]=detectorid[n][l+r]
-                    ptracksElem[j]=elementid[n][l-r]
-                    ptracksDet[j]=detectorid[n][l-r]
-            if(st>62):
-                for l in range(18,30):
-                    ptracksElem[j]=elementid[n][l]
-                    ptracksDet[j]=detectorid[n][l]
-                for k in range(random.randrange(0,4)):    
-                    ptracksElem[j]=elementid[n][l+r]
-                    ptracksDet[j]=detectorid[n][l+r]
-                    ptracksElem[j]=elementid[n][l-r]
-                    ptracksDet[j]=detectorid[n][l-r]
+#m=random.randrange(0,2) #Random number of partial tracks to input
+
+n=random.randrange(0,len(elementid)) #Select random event number
+r=random.randrange(1,n)
+s=random.randrange(1,r)
+#n=0
+#r=20
+#s=40
+
+st1=random.randrange(1,34) #Selects station
+st2=random.randrange(34,62) #Selects station        
+st3=random.randrange(62,79) #Selects station   
+
+print("This is the event:",n)
+#for j in range(m):
+for i in range(len(detectorid)):
+    
 
 
-# In[25]:
+    if(st1<=34 and detectorid[n][i]<=6):
+        for l in range(0,6):
+            #if(detectorid[n][l]>0):
+            ptracksElem[l]=elementid[n][l]
+            ptracksDet[l]=detectorid[n][l]
+            #print("This is n:", n)
+            #print("elemid", elementid[n][l])
+
+    if(st2>34 and st2<=62 and detectorid[r][i]>=13 and detectorid[r][i]<=18):
+        for l in range(12,18):
+            ptracksElem[l]=elementid[r][l]
+            ptracksDet[l]=detectorid[r][l]
+           # print("This is n:", r)
+            #print("elemid", elementid[r][l])
+        
+    if(st3>62 and detectorid[s][i]>=30):
+        for l in range(18,30):
+            ptracksElem[l]=elementid[s][l]
+            ptracksDet[l]=detectorid[s][l]
+            print("This is n:", s)
+            print("elemid", elementid[s][l])        
+      
+
+
+# In[6]:
 
 
 plt.title("HitMatrix")
-#plt.xlim(0,30)
-#plt.ylim(0,25)
+plt.xlim(0,70)
+plt.ylim(0,200)
 plt.scatter(ptracksDet[:],ptracksElem[:],marker='_')
+
+
+# In[52]:
+
+
+plt.title("HitMatrix")
+plt.xlim(30,60)
+plt.ylim(0,200)
+plt.scatter(detectorid[s],elementid[s],marker='_')
 
 
 # In[ ]:
