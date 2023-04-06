@@ -25,9 +25,10 @@ injectedTracks=np.load('injectedTracks.npy')
 # In[3]:
 
 
-#Actual track
-#targettree = uproot.open('Background/singMum_x2y2z300_370K.root:QA_ana')
-#targetdata = targettree.arrays(library="np")
+#Testing the minimizer. Adding tracks to partial Tracks
+
+partialTracks[1000]=[13,38]
+partialTracks[1001]=[14,39]
 
 
 # In[4]:
@@ -43,7 +44,7 @@ print(geomData)
 
 plt.scatter(partialTracks[:,0],partialTracks[:,1],marker='_')
 plt.scatter(injectedTracks[:,0],injectedTracks[:,1],marker='|',color='red')
-plt.xlim(0,6)
+plt.xlim(13,18)
 plt.ylim(0,200)
 
 #note the injected track is from event 96817!
@@ -63,7 +64,7 @@ partialTracks = partialTracks[~np.all(partialTracks == 0, axis=1)]
 #after zero removed
 plt.scatter(partialTracks[:,0],partialTracks[:,1],marker='_')
 plt.scatter(injectedTracks[:,0],injectedTracks[:,1],marker='+',color='red')
-plt.xlim(0,6)
+plt.xlim(13,18)
 plt.ylim(0,200)
 
 
@@ -101,7 +102,7 @@ print("Hits in total:",nSt1+nSt2+nSt3)
 
 hitPairX=np.zeros((2000,2))
 #Station 3 tracking X planes:
-det=1
+det=13
 index=0
 indexD=0
 for k in range(3):
@@ -140,7 +141,7 @@ for k in range(3):
 #plt.scatter(partialTracks[:,0],partialTracks[:,1],marker='_')
 plt.scatter(hitPairX[:,0],hitPairX[:,1],marker='_')
 plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='red',marker='+')
-plt.xlim(0,6)
+plt.xlim(0,30)
 plt.ylim(0,200)
 
 
@@ -149,15 +150,25 @@ plt.ylim(0,200)
 
 #Uwindow
 
+Station = 2
+if(Station == 1):
+    UID=5
+    XID=3
+    VID=1
+elif(Station == 2):
+    UID=17
+    XID=15
+    VID=13
+
 cosine=math.cos(.244)
 sine=math.sin(.244)
 tx=0.15
 ty=0.1
 delta=0.05
 L=1.2192
-URadius=(L*sine/2)+tx*abs(geomData[5][1]-geomData[3][1])*cosine+ty*abs(geomData[5][1]+geomData[3][1])*sine+2*geomData[5][4]+delta
-VRadius=tx*abs(geomData[5][1]+geomData[1][1]-2*geomData[3][1])*cosine+ty*abs(geomData[5][1]-geomData[1][1])*sine+2*geomData[1][4]
-print(VRadius)
+URadius=abs((geomData[UID][11]*sine/2))+tx*abs(geomData[UID][1]-geomData[XID][1])*cosine+ty*abs(geomData[UID][1]-geomData[XID][1])*sine+2*geomData[UID][4]+delta
+VRadius=tx*abs(geomData[UID][1]+geomData[VID][1]-2*geomData[XID][1])*cosine+ty*abs(geomData[UID][1]-geomData[VID][1])*sine+2*geomData[VID][4]
+print(URadius)
 
 
 # In[12]:
@@ -166,7 +177,7 @@ print(VRadius)
 hitPairX=np.zeros((2000,2))
 elemID=np.zeros((3,200))
 #Station 3 tracking X planes:
-det=1
+det=13
 index=0
 indexD=0
 for k in range(3):
@@ -208,31 +219,45 @@ print("-=-=--=-=-=-=-=-=-=-==-=-=-=-=-")
 # In[13]:
 
 
+#plt.scatter(partialTracks[:,0],partialTracks[:,1],marker='_')
+plt.scatter(hitPairX[:,0],hitPairX[:,1],marker='_')
+plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='red',marker='+')
+plt.xlim(13,18)
+plt.ylim(0,200)
+
+
+# In[14]:
+
+
 print("-=-=-=--=-=-=U plane=-=-=-=-=-")
 
 i=0
 j=0
+k=0
 NumberX=np.count_nonzero(elemID[1])
 NumberU=np.count_nonzero(elemID[2])
 NumberV=np.count_nonzero(elemID[0])
 
 if(NumberX!=1):
-    XPosition=np.zeros(len(NumberX))
+    XPosition=np.zeros(NumberX)
 else:
     XPosition=np.zeros(1)
-ucenter=np.zeros(len(XPosition))
-index=np.where(hitPairX[:,0]==4)
-indexD=np.where(hitPairX[:,0]==6)
+ucenter=np.zeros(NumberU)
+index=np.where(hitPairX[:,0]==16)
+indexD=np.where(hitPairX[:,0]==18)
 
-for i in range(len(index[0])):
-    for j in range(NumberX):
-        XPosition[j]=hitPairX[index[i],1]-((geomData[3][2]+1)/2)*(geomData[3][4])+geomData[3][5]+geomData[3][7]*geomData[3][10]+geomData[3][12]*geomData[3][4]+geomData[3][26]
-        ucenter[j]=XPosition[j]*cosine
+for i in range(NumberX):
+    XPosition[i]=(hitPairX[index[0],1][i]-(geomData[XID][2]+1)/2)*geomData[XID][4]+geomData[XID][5]+geomData[XID][7]*geomData[XID][10]+geomData[XID][12]*geomData[XID][4]+geomData[XID][26]
+    print(hitPairX[index[0],1][i])
+    print(XPosition[i])
+for j in range(NumberU):
+    for k in range(len(XPosition)):
+        ucenter[j]=XPosition[k]*cosine
         print(ucenter[j])
     
 
 
-# In[14]:
+# In[15]:
 
 
 print("-=-=-=--=-=-=V plane=-=-=-=-=-")
@@ -252,27 +277,27 @@ if(NumberV!=1):
 else:
     VPosition=np.zeros(1)
     
-indexU=np.where(hitPairX[:,0]==6)
-indexV=np.where(hitPairX[:,0]==2)
-indexX=np.where(hitPairX[:,0]==4)
+indexU=np.where(hitPairX[:,0]==18)
+indexV=np.where(hitPairX[:,0]==14)
+indexX=np.where(hitPairX[:,0]==16)
 
 vcenter=np.zeros(len(indexV[0]))
 
-for i in range(NumberU):
-    UPosition[i]=hitPairX[indexX[0][i],1]-((geomData[5][2]+1)/2)*(geomData[5][4])+geomData[5][5]+geomData[5][7]*geomData[5][10]+geomData[5][12]*geomData[5][4]+geomData[5][26]
-    print(UPosition[i])
-    for j in range(NumberV):
-        VPosition[j]=hitPairX[indexV[0][j],1]-((geomData[1][2]+1)/2)*(geomData[1][4])+geomData[1][5]+geomData[1][7]*geomData[1][10]+geomData[1][12]*geomData[1][4]+geomData[1][26]
-        print(VPosition)
-        for k in range(NumberX):
-            for l in range(NumberU):
-                vcenter[j]=2*XPosition[k]*cosine-UPosition[l]
-                print(vcenter[j])
+
+for i in range(NumberX):
+    for j in range(NumberU):
+        UPosition[j]=(hitPairX[indexU[0][i],1]-(geomData[UID][2]+1)/2)*(geomData[UID][4])+geomData[UID][5]+geomData[UID][7]*geomData[UID][10]+geomData[UID][12]*geomData[UID][4]+geomData[UID][26]
+        print(UPosition[j])
+        for k in range(NumberV):
+            VPosition[k]=(hitPairX[indexV[0][k],1]-(geomData[VID][2]+1)/2)*(geomData[VID][4])+geomData[VID][5]+geomData[VID][7]*geomData[VID][10]+geomData[VID][12]*geomData[VID][4]+geomData[VID][26]
+            print(VPosition)
+            vcenter[k]=2*XPosition[i]*cosine-UPosition[j]
+            print(vcenter[k])
 
             
 
 
-# In[15]:
+# In[16]:
 
 
 i=0
@@ -280,41 +305,64 @@ i=0
 
 for i in range(NumberU):
        # if(hitPairX[indexD[0][i],1]<=ucenter[i]+URadius and hitPairX[indexD[0][i],1]>=ucenter[i]-URadius):
-        if(UPosition[i]>=ucenter[i]-URadius and UPosition[i]<=ucenter[i]+URadius):
+        if(UPosition[i]>ucenter[i]-URadius and UPosition[i]<ucenter[i]+URadius):
 
-            print("hit confirmed in U")
+            print("hit confirmed in U", UPosition[i], "vs", ucenter[i]-URadius, "and", ucenter[i]+URadius)
 
         else:
             
             print("hit removed", hitPairX[indexU[0][i]])
-            print("not between", ucenter[i]+URadius, "and", ucenter[i]-URadius)
+            print("not a hit" , UPosition[i], "vs", ucenter[i]-URadius, "and", ucenter[i]+URadius)
             
             hitPairX[indexU[0][i]]=[0,0]
             hitPairX[indexU[0][i]-1]=[0,0]
 
 i=0            
 for i in range(NumberV):
-    if(VPosition[i]>=vcenter[i]-VRadius and VPosition[i]<=vcenter[i]+VRadius):
-        print("hit confirmed in V")
-        print (vcenter[i])
+    if(VPosition[i]>vcenter[i]-VRadius and VPosition[i]<vcenter[i]+VRadius):
+        print("hit confirmed in V",VPosition[i], "vs", vcenter[i]-VRadius, "and", vcenter[i]+VRadius)
 
     else:
-        print("hit removed")
-        print("Hits", hitPairX[indexV[0][i]], vcenter[i]+VRadius, vcenter[i]-VRadius)
+        print("hit removed in V",VPosition[i], "vs", vcenter[i]-VRadius, "and", vcenter[i]+VRadius)
         hitPairX[indexV[0][i]]=[0,0]
         hitPairX[indexV[0][i]-1]=[0,0]
 
 
-# In[16]:
+# In[18]:
 
 
 plt.scatter(hitPairX[:,0],hitPairX[:,1],marker='_')
 plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='red',marker='+')
-plt.xlim(0,6)
+plt.xlim(13,18)
 plt.ylim(0,200)
 i=0
 for i in range(10):
     print(hitPairX[i])
+
+
+# In[23]:
+
+
+hitPairX[index[0],1][1]
+
+
+# In[34]:
+
+
+indexV=np.where(hitPairX[:,0]==2)
+print(indexV)
+
+
+# In[7]:
+
+
+partialTracks[1000]
+
+
+# In[37]:
+
+
+geomData[0][11]
 
 
 # In[ ]:
