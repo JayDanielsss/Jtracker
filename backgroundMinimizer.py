@@ -20,7 +20,7 @@ import dearpygui.dearpygui as dpg
 # In[2]:
 
 
-c=0#random.choice((+1,-1))
+c=+1#random.choice((+1,-1))
 
 
 if(c==0):
@@ -30,9 +30,9 @@ if(c==0):
     injectedTracks=np.load("injectedTrackscompare2.npy")
 
 if(c==+1):
-    partialTracks=np.load('partialTrackTests5.npy')
+    partialTracks=np.load('partialTrackTests6.npy')
     #injectedTracks=np.load('injectedTrackTests3.npy')
-    injectedTracks=np.load('injectedTracks5.npy')
+    injectedTracks=np.load('injectedTracksTests6.npy')
     #injectedTrack2=np.load('injectedTrack2.npy')
 
 
@@ -47,17 +47,11 @@ if(c==-1):
 # In[3]:
 
 
-#injectedTracks=np.concatenate((injectedTrack1, injectedTrack2))
-#injectedTracks = injectedTracks[~np.all(injectedTracks == 0, axis=1)]
-
-
-# In[4]:
-
-
+print("Here are the hits")
 partialTracks
 
 
-# In[5]:
+# In[4]:
 
 
 #Testing the minimizer. Adding tracks to partial Tracks
@@ -65,7 +59,7 @@ testing = True
 
 if(testing):
     #Gives a random number of partial tracks
-    m=20#random.randrange(3,50)
+    m=30#random.randrange(3,50)
     print(m)
     d=0
     for i in range(m):
@@ -80,13 +74,7 @@ if(testing):
         print(d)
 
 
-# In[6]:
-
-
-len(partialTracks)
-
-
-# In[7]:
+# In[5]:
 
 
 #Parameters based on geometery of the detector. 
@@ -95,14 +83,14 @@ np.reshape(geomData, (30,27))
 print(geomData)
 
 
-# In[8]:
+# In[6]:
 
 
 #remove zeros
 partialTracks = partialTracks[~np.all(partialTracks == 0, axis=1)]
 
 
-# In[9]:
+# In[7]:
 
 
 #number of hits
@@ -138,7 +126,7 @@ print("Hits in total:",nSt1+nSt2+nSt3m+nSt3p)
     
 
 
-# In[10]:
+# In[8]:
 
 
 #plt.scatter(partialTracks[:,0],partialTracks[:,1],marker='_')
@@ -151,7 +139,7 @@ plt.ylim(0,200)
 plt.show()
 
 
-# In[11]:
+# In[9]:
 
 
 #Determines hit pairs through the whole detector
@@ -190,7 +178,7 @@ for k in range(15):
 
 
 
-# In[12]:
+# In[10]:
 
 
 #plt.scatter(partialTracks[:,0],partialTracks[:,1],marker='_')
@@ -200,7 +188,7 @@ plt.xlim(12,30)
 plt.ylim(0,200)
 
 
-# In[13]:
+# In[11]:
 
 
 #math and values from paper
@@ -268,80 +256,29 @@ def Radius(Station):
     return(URadius,VRadius,VID,XID,UID, cosine, sine)
 
 
-# In[14]:
+# In[12]:
 
 
 def getPosition(ID,Number, index):
     
     Position=[]
-    
+    Position=np.append(Position,[((hitPairX[index,1]-(geomData[ID][2]+1)/2)*geomData[ID][4]+geomData[ID][5]+geomData[ID][7]*geomData[ID][10]+geomData[ID][12]*geomData[ID][15]+geomData[ID][26],index)])
+   # print("elemid",hitPairX[index[0,1][i])
+
     #if(Number!=1):
        # Position=np.zeros((Number,2))
     #else:
      #   Position=np.zeros((1,2))
         
-    for i in range(Number):
+    #for i in range(Number):
         #Position[i]=(hitPairX[index[0],1][i]-(geomData[ID][2]+1)/2)*geomData[ID][4]+geomData[ID][5]+geomData[ID][7]*geomData[ID][10]+geomData[ID][12]*geomData[ID][4]+geomData[ID][26],index[0][i]
-        Position=np.append(Position,[((hitPairX[index[0],1][i]-(geomData[ID][2]+1)/2)*geomData[ID][4]+geomData[ID][5]+geomData[ID][7]*geomData[ID][10]+geomData[ID][12]*geomData[ID][15]+geomData[ID][26],index[0][i])])
-        print("elemid",hitPairX[index[0],1][i])
-    Position=np.reshape(Position, (Number,2))
+        #Position=np.append(Position,[((hitPairX[index[0],1][i]-(geomData[ID][2]+1)/2)*geomData[ID][4]+geomData[ID][5]+geomData[ID][7]*geomData[ID][10]+geomData[ID][12]*geomData[ID][15]+geomData[ID][26],index[0][i])])
+        #print("elemid",hitPairX[index[0],1][i])
+    Position=np.reshape(Position, (-1,2))
     return(Position)
 
 
-# In[15]:
-
-
-#NO LONGER NEEDED
-
-def getCenter(XPosition,UPosition,cosine):
-    
-
-    print("ucenter, Xhit")
-    ucenter=[]
-    for i in range(len(XPosition)):
-        ucenter=np.append(ucenter,[XPosition[i,0]*cosine,XPosition[i,1]],axis=0)
-
-    ucenter=np.reshape(ucenter,(len(XPosition),2))
-    print(ucenter)
-
-    vcenter=[]
-    index=0
-    print("vcenter, xhit, uhit")
-    #if(len(UPosition[0])>1):
-    for i in range(len(ucenter)):
-        for j in range(len(UPosition)):
-            #vcenter[index]=2*ucenter[0][i]-UPosition[j,0],ucenter[1][i],UPosition[j,1]
-            vcenter=np.append(vcenter,[2*ucenter[i,0]-UPosition[j,0],ucenter[i,1],UPosition[j,1]])
-            index+=1
-
-            
-    print("this is ucenter:", ucenter)
-    print("this is vcenter",vcenter)
-
-    vcenter=np.reshape(vcenter,(index,3))
-        
-
-    return(ucenter,vcenter)
-
-
-# In[16]:
-
-
-def plotcenter(VID, vcenter, UID, ucenter):
-    vc=[]
-    ID=VID
-    for i in range(len(vcenter)):
-        vc=np.append(vc,[vcenter[i]+((geomData[ID][2]+1)/2)*geomData[ID][4]-geomData[ID][5]-geomData[ID][7]*geomData[ID][10]-geomData[ID][12]*geomData[ID][4]-geomData[ID][26]])
-   
-    uc=[]
-    ID=UID
-    for i in range(len(ucenter)):
-        uc=np.append(uc,[ucenter[i]+((geomData[ID][2]+1)/2)*geomData[ID][4]-geomData[ID][5]-geomData[ID][7]*geomData[ID][10]-geomData[ID][12]*geomData[ID][4]-geomData[ID][26]])
-
-    return(vc,uc)
-
-
-# In[17]:
+# In[13]:
 
 
 def getElemIDFromPos(ID,position):
@@ -351,214 +288,71 @@ def getElemIDFromPos(ID,position):
     return(E)
 
 
-# In[193]:
+# In[14]:
 
 
 def compareArray(a,b):
-    n = min(len(a), len(b))
-    out_idx = np.flatnonzero(a[:n] == b[:n])
-    out_val = a[out_idx]
+   # n = min(len(a), len(b))
+    #out_idx = np.flatnonzero(a[:n] == b[:n])
+    #out_val = a[out_idx]
+    
+    out_idx=[]
+    for i in range(len(a)):
+        for j in range(len(b)):
+            if(a[i]==b[j]):
+                out_idx=np.append(out_idx,[i])
+                
+    out_idx=np.unique(out_idx)
+    
     
     return(out_idx)
 
 
-# In[194]:
+# In[15]:
 
 
-def getTrackletXU(Position,center,Radius,s,ID):
-    
-   # if(len(Position)>1 and len(center[0])>1):
-    index=0
-    TrackletsXU=[]
-    
-    for i in range(len(Position)):
-        for j in range(len(center)):
-            if(Position[i][0]>center[j][0]-Radius and Position[i][0]<center[j][0]+Radius):
-                print("hit!")
-                print(Position[i][0],center[j][0]-Radius,center[j][0]+Radius)
-                print("This is the U hit!",Position[i][1])
-                print("This is the X hit!",center[j][1])
-               # TrackletsXU[index]=center[1][j],Position[i][1]
-                index+=1
-                
-                TrackletsXU=np.append(TrackletsXU,[center[j][1],Position[i][1]])
-                print(center)
-               
+def buildTracklet(Tracklet,s):
 
-            else:
-                print("oops!")
-                print(Position[i][0],center[j][0]-Radius,center[j][0]+Radius)
-                
-               
-                print("This is the U hit!",Position[i][1])
-                print("This is the X hit!",center[j][1])
+    Tracklets=np.zeros((len(Tracklet),6,2))
 
-  
-        
-    #TrackletsXU = np.unique(TrackletsXU)
+    if(s==2):
 
-    TrackletsXU=np.reshape(TrackletsXU,(-1,2))
-    print("This is trackletXU", TrackletsXU)
-    return(TrackletsXU)
+        for l in range(len(Tracklet)):    
+            Tracklets[l][0]=hitPairX[Tracklet[l,0].astype(int)]
+            Tracklets[l][1]=hitPairX[Tracklet[l,0].astype(int)+1]
+
+            Tracklets[l][2]=hitPairX[Tracklet[l,1].astype(int)-1]
+            Tracklets[l][3]=hitPairX[Tracklet[l,1].astype(int)]
+
+            Tracklets[l][4]=hitPairX[Tracklet[l,2].astype(int)]
+            Tracklets[l][5]=hitPairX[Tracklet[l,2].astype(int)+1]
+
+    if(s==3 or s==4):
+        for l in range(len(Tracklet)):    
+
+            Tracklets[l][0]=hitPairX[Tracklet[l,0].astype(int)-1]
+            Tracklets[l][1]=hitPairX[Tracklet[l,0].astype(int)]
+
+            Tracklets[l][2]=hitPairX[Tracklet[l,1].astype(int)-1]
+            Tracklets[l][3]=hitPairX[Tracklet[l,1].astype(int)]
+
+            Tracklets[l][4]=hitPairX[Tracklet[l,2].astype(int)-1]
+            Tracklets[l][5]=hitPairX[Tracklet[l,2].astype(int)]
 
 
-# In[195]:
 
 
-def getTrackletV(Position,center,Radius,s,ID):
-    
-   # if(len(Position)>1):
-      #  print(len(Position[0]))
-    indexg=0
-    indexb=0
-    goodHitV=[]
-    goodHitXU=[]
-    badHitV=[]
-    badHitXU=[]
-    for i in range(len(Position)):
-        for j in range(len(center)):
-            if(Position[i][0]>center[j,0]-Radius and Position[i][0]<center[j,0]+Radius):
-                print(Position[i][0],center[j,0]-Radius,center[j,0]+Radius,)
-                print("hit!")
-                #goodHitV[indexg]=Position[i][1]
-                #goodHitXU[indexg]=center[j,1],center[j,2]
-                indexg+=1
-                goodHitV=np.append(goodHitV,[Position[i][1]]).T
-                goodHitXU=np.append(goodHitXU,[center[j,1],center[j,2]])
-                
-
-            else:
-                print("oops!")
-                print(Position[i][0],center[j,0]-Radius,center[j,0]+Radius)
-                
-                #badHitXU[indexb]=center[j,1],center[j,2]
-                #badHitV[indexb]=Position[i][1]
-                indexb+=1
-                badHitV=np.append(badHitV,[Position[i][1]]).T
-                badHitXU=np.append(badHitXU,[center[j,1],center[j,2]])
-    #else:
-       # if(Position[0][0]>center[0]-Radius and Position[0][0]<center[0]+Radius):
-           # print("hit!")
-           # goodHitVXU[0]=Position[0][1],center[1],center[2]
-           # print(Position[0][1],center[1],center[2])
-        #else:
-            #print("oops!")
-           # badHitVXU[0]=Position[0][1],center[1],center[2]
-            #print(Position[0][1],center[1],center[2])
-            
-    if(np.any(goodHitXU)):
-        goodHitXU=np.reshape(goodHitXU,(int(-1*len(goodHitXU)/2),2))
-        #goodHitXU=np.reshape(np.unique(goodHitXU),(-1,2)).T
-    if(np.any(badHitXU)):
-        badHitXU=np.reshape(badHitXU,(int(-1*len(badHitXU)/2),2))
-    
-    return(goodHitV,goodHitXU,badHitV,badHitXU)
 
 
-# In[196]:
 
 
-def buildTracklet(TrackletsXU, goodHitXU, badHitXU,goodHitV,badHitV,s):
-    flag=np.any(goodHitV)
-    
-    index=[]
-    
-    print("this is goodhitxu", badHitXU)
-    if(flag==True):
-        print("we are using the good v hits")
-        #index=np.zeros(len(goodHitXU))
 
-        for i in range(len(goodHitV)):
-            for j in range(len(TrackletsXU)):
-                    if(goodHitXU[i,0]==TrackletsXU[j,0] and goodHitXU[i,1]==TrackletsXU[j,1]):
-                        print("goodHit found!",goodHitXU[j])
-                        index=np.append(index,i)
-        index=np.unique(index)                
-        print("index -> ",index)
-
-            
-        Tracklets=np.zeros((len(index),6,2))
-        
-        if(s==2):
-
-            for l in range(len(index)):    
-                Tracklets[l][0]=hitPairX[goodHitV[int(index[l])].astype(int)]
-                Tracklets[l][1]=hitPairX[goodHitV[int(index[l])].astype(int)+1]
-
-                Tracklets[l][2]=hitPairX[goodHitXU[int(index[l])].astype(int)-1][0]
-                Tracklets[l][3]=hitPairX[goodHitXU[int(index[l])].astype(int)][0]
-
-                Tracklets[l][4]=hitPairX[goodHitXU[int(index[l])].astype(int)][1]
-                Tracklets[l][5]=hitPairX[goodHitXU[int(index[l])].astype(int)+1][1]
-                
-        if(s==3 or s==4):
-            for l in range(len(index)):    
-
-                Tracklets[l][0]=hitPairX[goodHitV[int(index[l])].astype(int)-1]
-                Tracklets[l][1]=hitPairX[goodHitV[int(index[l])].astype(int)]
-
-                Tracklets[l][2]=hitPairX[goodHitXU[int(index[l])].astype(int)-1][0]
-                Tracklets[l][3]=hitPairX[goodHitXU[int(index[l])].astype(int)][0]
-
-                Tracklets[l][4]=hitPairX[goodHitXU[int(index[l])].astype(int)-1][1]
-                Tracklets[l][5]=hitPairX[goodHitXU[int(index[l])].astype(int)][1]
-        
-    
-    
-    
-    
-    if(flag==False):
-        print("oh darn, no good hits in v. Empty Station?")
-        
-        for j in range(len(badHitXU)):
-            for k in range(len(TrackletsXU)):
-                if(badHitXU[j,0]==TrackletsXU[k,0] and badHitXU[j,1]==TrackletsXU[k,1]):
-                    print("Hit found!",badHitXU[j])
-                    index=np.append(index,j)
-
-        
-        Tracklets=np.zeros((len(index),6,2))
-        
-        if(s==2):
-
-            for l in range(len(index)):    
-                Tracklets[l][0]=0
-                Tracklets[l][1]=0
-
-                Tracklets[l][2]=hitPairX[badHitXU[int(index[l])].astype(int)-1][0]
-                Tracklets[l][3]=hitPairX[badHitXU[int(index[l])].astype(int)][0]
-
-                Tracklets[l][4]=hitPairX[badHitXU[int(index[l])].astype(int)][1]
-                Tracklets[l][5]=hitPairX[badHitXU[int(index[l])].astype(int)+1][1]
-                
-        if(s==3 or s==4):
-            
-           
-            for l in range(len(index)):    
-
-                Tracklets[l][0]=0
-                Tracklets[l][1]=0
-
-                Tracklets[l][2]=hitPairX[badHitXU[int(index[l])].astype(int)-1][0]
-                Tracklets[l][3]=hitPairX[badHitXU[int(index[l])].astype(int)][0]
-
-                Tracklets[l][4]=hitPairX[badHitXU[int(index[l])].astype(int)-1][1]
-                Tracklets[l][5]=hitPairX[badHitXU[int(index[l])].astype(int)][1]
-        
-    
-        
-    
-
-    
-    
-    
-    
     
 
     return(Tracklets)
 
 
-# In[197]:
+# In[16]:
 
 
 #Setting what the planes are based off the station
@@ -568,7 +362,7 @@ print("This is the start of the loop")
 
 TrackletSt2=[]
 TrackletSt3pm=[]
-for s in range(4,5):
+for s in range(2,5):
     URadius,VRadius,VID,XID,UID, cosine, sine=Radius(s)
     #Shows what station:
     print("we are in Station:", s)
@@ -623,101 +417,69 @@ for s in range(4,5):
             for i in range(NumberX):
                 hitPairX[indexX[0][i]]=[0,0]
                 hitPairX[indexX[0][i]-1]=[0,0]
-           
-    xhit=np.zeros(NumberX)       
+                
+    TrackletXU=[]
+    TrackletVXU=[]
+    vcplt=[]
+    ucplt=[]
+                
+    for i in range(NumberX):
+        print("collecting the XPosition")
+        XPosition=getPosition(XID,NumberX,indexX[0][i])
+        print("This is XPosition: ", XPosition)
 
-    XPosition=getPosition(XID,NumberX,indexX)
-    UPosition=getPosition(UID,NumberU,indexU)
-    VPosition=getPosition(VID,NumberV,indexV)
-    
-    
-
-
-
-
-    
-    print("ucenter, Xhit")
-    vcenter=[]
-
-    #ucenter=np.append(ucenter,[XPosition[:,0]*cosine,XPosition[:,1]],axis=0)
-
-    ucenter=np.zeros((len(XPosition),2))
-    for i in range(len(XPosition)):
-        ucenter[i,0]=XPosition[i,0]*cosine
-        ucenter[i,1]=XPosition[i,1]
-
-    print(ucenter)    
+        print("Collecting UCenter")
+        ucenter=[XPosition[0,0]*cosine,XPosition[0,1]]
         
-
-    #ucenter=np.reshape(ucenter,(len(XPosition),2))
-
-
-
-    #ucenter=getCenter(XPosition,UPosition,cosine)
-    print("This is ucenter",ucenter)
-
-    print("Lets form tracklets!")
-    print("forming Tracklet XU")
-    TrackletsXU=getTrackletXU(UPosition,ucenter,URadius,s,UID)
-    print("getting vcenter")
-
-
-    if(TrackletsXU.any()==True):
-
-        ucent=[]
-        comparedindex=compareArray(ucenter[:,1],TrackletsXU[:,0])
-        for k in range(len(comparedindex)):
-            ucent=np.append(ucent,[ucenter[comparedindex[k]]])
-        ucenter=np.reshape(ucent,(-1,2))
-
-        #ucenter=np.reshape(recenter,(-1,2))
-        print("recentered Ucenter", ucenter)
-
-        upos=[]
-        comparedindex=compareArray(UPosition[:,1],TrackletsXU[:,1])
-        for k in range(len(comparedindex)):
-            upos=np.append(upos,[UPosition[comparedindex[k]]])
-        upos=np.reshape(upos,(-1,2))
-
-
-        for k in range(len(upos)):
-            vcenter=np.append(vcenter,[2*ucenter[k,0]-upos[k,0],ucenter[k,1],upos[k,1]], axis = None)
-
-
-
-    print("this is vcenter",vcenter)
-
-    vcenter=np.reshape(vcenter,(-1,3))
-
-    
-    
+        print("This is the ucenter: ", ucenter)    
         
-    #vcenter[0,0]=UPosition[0,0]
-    
-    print("geeting good hits in v plane based off XU")
-    goodHitV,goodHitXU,badHitV,badHitXU=getTrackletV(VPosition,vcenter,VRadius,s,VID)
-    
-    print("connecting good V hits to good XU hits")
-    Tracklets=buildTracklet(TrackletsXU, goodHitXU, badHitXU,goodHitV,badHitV,s)
-    
-    print("Here are the tracks for station:",s)
-    print(Tracklets)    
-        
-    
+        for j in range(NumberU):
+            print("collecting the UPosition")
+            UPosition=getPosition(UID,NumberU,indexU[0][j])
+            print("This is UPosition: ", UPosition)
+
+            print("making UX Track")
+            if(UPosition[0,0]>ucenter[0]-URadius and UPosition[0,0]<ucenter[0]+URadius):
+                print("hit!")
+                print(UPosition[0,0],ucenter[0]-URadius,ucenter[0]+URadius,)   
+                TrackletXU=np.append(TrackletXU,[ucenter[1],UPosition[0,1]])
+                
+            print("collecting vcenter")
+            vcenter=[2*ucenter[0]-UPosition[0,0],ucenter[1],UPosition[0,1]]
+            print("This is vcenter: ", vcenter)
+            
+            for k in range(NumberV):
+                print("collecting the VPosition")
+                VPosition=getPosition(VID,NumberV,indexV[0][k])
+                print("This is VPosition: ", VPosition)
+                
+                if(VPosition[0,0]>vcenter[0]-VRadius and VPosition[0,0]<vcenter[0]+VRadius):
+                    print("hit!")
+                    print(VPosition[0,0],vcenter[0]-VRadius,vcenter[0]+VRadius,)
+                    TrackletVXU=np.append(TrackletVXU,[VPosition[0,1],vcenter[1],vcenter[2]])
+                    ucplt=np.append(ucplt,(ucenter))
+                    vcplt=np.append(vcplt,(vcenter))
+
+                    
+    TrackletXU=np.reshape(TrackletXU,(-1,2))
+    TrackletVXU=np.reshape(TrackletVXU,(-1,3))
+    ucplt=np.reshape(ucplt,(-1,2))
+    vcplt=np.reshape(vcplt,(-1,3))
+
+    print("Lets combine the tracklets")
+
+    Tracklets=buildTracklet(TrackletVXU,s)
+    Tracklets
+
     if(s==2):
         print("saving Tracklets 2")
 
         TrackletSt2=np.append(TrackletSt2,Tracklets)
-        
+
     if(s==3 or s==4):
         print("saving Tracklets 3pm")
         TrackletSt3pm=np.append(TrackletSt3pm,Tracklets)
-    
 
-
-
-
-# In[198]:
 
 
 #reshaping to organize properly
@@ -725,13 +487,7 @@ TrackletSt2=np.reshape(TrackletSt2,(-1,6,2))
 TrackletSt3pm=np.reshape(TrackletSt3pm,(-1,6,2))
 
 
-# In[199]:
-
-
-goodHitXU
-
-
-# In[200]:
+# In[17]:
 
 
 print("plotting Station 2")
@@ -753,13 +509,29 @@ plt.ylim(0,200)
 
 
 
-# In[ ]:
+# In[18]:
+
+
+print("plotting Station 3mp")
+
+cmap = plt.cm.get_cmap("plasma")
+marker = itertools.cycle((',', '+', '.', 'o', '*','_')) 
+
+for i in range(len(TrackletSt3pm)):
+
+    plt.scatter(TrackletSt3pm[i][:,0],TrackletSt3pm[i][:,1],marker=next(marker))
+
+
+plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='k',marker='|')
+
+plt.xlim(18.5,30.5)
+plt.ylim(0,200)
 
 
 
 
 
-# In[201]:
+# In[19]:
 
 
 # string to search in file
@@ -778,7 +550,7 @@ with open(r'comparison/log.txt', 'r') as fp, open('Kinfo.txt','w') as fk:
             fk.write(row)
 
 
-# In[202]:
+# In[20]:
 
 
 ktrackerData = np.genfromtxt('Kinfo.txt', delimiter=',')
@@ -787,7 +559,7 @@ ktrackerData = np.reshape(ktrackerData,(-1,9))
 print(ktrackerData)
 
 
-# In[203]:
+# In[21]:
 
 
 ktdata=[]
@@ -796,25 +568,13 @@ for i in range(len(ktrackerData)):
         ktdata=np.append(ktdata,ktrackerData[i])
 
 
-# In[204]:
+# In[22]:
 
 
 ktrackerData = np.reshape(ktdata,(-1,9))
 
 
-# In[205]:
-
-
-ktrackerData[9,5]
-
-
-# In[206]:
-
-
-TrackletsXU
-
-
-# In[207]:
+# In[23]:
 
 
 kvcenter=[]
@@ -857,13 +617,7 @@ kvpos=np.reshape(kvpos,(-1,2))
 
 
 
-# In[ ]:
-
-
-
-
-
-# In[208]:
+# In[24]:
 
 
 kumax=np.delete(kumax,np.where(kumax[:,1]!=s),0)
@@ -880,7 +634,7 @@ kvpos=np.delete(kvpos,np.where(kvpos[:,1]!=s),0)
 
 
 
-# In[209]:
+# In[25]:
 
 
 def getRatio(ktracker,python):
@@ -893,16 +647,16 @@ def getRatio(ktracker,python):
     return(ratio)
 
 
-# In[210]:
+# In[26]:
 
 
-vMin=vcenter-VRadius
-vMax=vcenter+VRadius
+#vMin=vcenter-VRadius
+#vMax=vcenter+VRadius
 
-getRatio(kvcenter[:,0],vcenter[:,0])
+#getRatio(kvcenter[:,0],vcenter[:,0])
 
 
-# In[211]:
+# In[27]:
 
 
 print("plotting Station 3pm")
@@ -917,19 +671,19 @@ marker = itertools.cycle((',', '+', '.', 'o', '*','_'))
 #Python
 
 print("lets get plottable centers")
-vc=getElemIDFromPos(VID,vcenter[:,0])
-uc=getElemIDFromPos(UID,ucenter[:,0])
+vc=getElemIDFromPos(VID,vcplt[:,0])
+uc=getElemIDFromPos(UID,ucplt[:,0])
 
 for i in range(len(vc)):    
     plt.hlines(y=vc[i],xmin=(VID-1),xmax=(VID+1),color='black',linestyle='-')
 for i in range(len(uc)):    
     plt.hlines(y=uc[i],xmin=(UID-1),xmax=(UID+1),color='black',linestyle='-')
     
-vmin=getElemIDFromPos(VID,vcenter[:,0]-VRadius)
-vmax=getElemIDFromPos(VID,vcenter[:,0]+VRadius)
+vmin=getElemIDFromPos(VID,vcplt[:,0]-VRadius)
+vmax=getElemIDFromPos(VID,vcplt[:,0]+VRadius)
 
-umin=getElemIDFromPos(UID,ucenter[:,0]-URadius)
-umax=getElemIDFromPos(UID,ucenter[:,0]+URadius)
+umin=getElemIDFromPos(UID,ucplt[:,0]-URadius)
+umax=getElemIDFromPos(UID,ucplt[:,0]+URadius)
 for i in range(len(vmin)):
     plt.vlines(x = VID, ymin = vmin[i], ymax = vmax[i], colors = 'black', label ='V window')
     
@@ -952,34 +706,24 @@ for i in range(len(kvc)):
     plt.hlines(y=kvc[i],xmin=VID-1,xmax=VID+1,color='red',linestyle='-')
 for i in range(len(kuc)):
     plt.hlines(y=kuc[i],xmin=UID-1,xmax=UID+1,color='red',linestyle='-')
-#for i in range(len(kvMin)):
-    #plt.vlines(x = VID, ymin = kvMin[i], ymax = kvMax[i], colors = 'red', label ='U window')
+for i in range(len(kvMin)):
+    plt.vlines(x = VID, ymin = kvMin[i], ymax = kvMax[i], colors = 'red', label ='U window')
 
 for i in range(len(kuMin)):
     plt.vlines(x = UID, ymin = kuMin[i], ymax = kuMax[i], colors = 'red', label ='U window')
+
 plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='red',marker='+')
 
-plt.xlim(20,30)
+plt.xlim(12,30)
 plt.ylim(0,200)
 
 
-# In[212]:
-
-
-Tracklets
-
-
-# In[216]:
-
-
-TrackletSt3pm
-
-
-# In[215]:
+# In[32]:
 
 
 cmap = plt.cm.get_cmap("plasma")
 marker = itertools.cycle((',', '+', '.', 'o', '*','_')) 
+plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='k',marker='d')
 
 for i in range(len(TrackletSt2)):
 
@@ -989,39 +733,7 @@ for i in range(len(TrackletSt3pm)):
 
     plt.scatter(TrackletSt3pm[i][:,0],TrackletSt3pm[i][:,1],marker=next(marker))
     
-plt.scatter(injectedTracks[:,0],injectedTracks[:,1],color='k',marker='|')
 
-plt.xlim(24,30.5)
+plt.xlim(12,30.5)
 plt.ylim(0,200)
-
-
-# In[43]:
-
-
-for i in range(18,30):
-    print(geomData[i][0])
-    print(geomData[i][5])
-
-
-# In[45]:
-
-
-print(((geomData[XID][2]+1)/2)*geomData[XID][4])
-print(geomData[XID][5])
-print(geomData[XID][7],geomData[XID][10])
-print(geomData[XID][12],geomData[XID][15])
-print(geomData[XID][26])
- 
-
-
-# In[46]:
-
-
-(((geomData[XID][2]+1)/2)*geomData[XID][4])+geomData[XID][5]+geomData[XID][7]*geomData[XID][10]+geomData[XID][12]*geomData[XID][15]+geomData[XID][26]
-
-
-# In[ ]:
-
-
-
 
